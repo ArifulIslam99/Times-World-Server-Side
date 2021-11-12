@@ -17,6 +17,7 @@ async function run(){
          await client.connect();
          const database = client.db('Times_World')
          const productCollection = database.collection('products')
+         const orderCollection = database.collection('Orders')
 
          app.get('/products', async (req, res)=>{
              const result =  productCollection.find({});
@@ -29,8 +30,21 @@ async function run(){
              const id = req.params.id;
              const query = {_id: ObjectId(id)}
              const result = await productCollection.findOne(query)
-             res.json(result)
+             res.send(result)
          })
+         
+         app.post('/orders', async(req, res)=>{
+            const order = req.body;
+            console.log(order)
+            const result = await orderCollection.insertOne(order);
+            res.json(result )
+        })
+        app.get('/orders', async (req, res)=>{
+            const result = orderCollection.find({});
+            const orders = await result.toArray();
+            res.send(orders)
+        })
+ 
          
       }
       finally{
