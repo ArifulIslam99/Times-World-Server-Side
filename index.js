@@ -3,6 +3,7 @@ const app = express();
 require('dotenv').config()
 const port = process.env.PORT || 5000 ;
 const cors = require('cors')
+const ObjectId = require('mongodb').ObjectID;
 app.use(cors())
 app.use(express.json())
 const { MongoClient } = require('mongodb');
@@ -23,6 +24,13 @@ async function run(){
 
              res.json(products)
          })
+
+         app.get('/products/:id', async (req, res)=>{
+             const id = req.params.id;
+             const query = {_id: ObjectId(id)}
+             const result = await productCollection.findOne(query)
+             res.json(result)
+         })
          
       }
       finally{
@@ -31,7 +39,6 @@ async function run(){
 }
 run().catch(console.dir)
 
-console.log(uri)
 
 app.get('/', (req, res) => {
     res.send("Server is Running")
