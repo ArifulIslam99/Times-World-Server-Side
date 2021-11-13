@@ -30,12 +30,11 @@ async function run(){
              const id = req.params.id;
              const query = {_id: ObjectId(id)}
              const result = await productCollection.findOne(query)
-             res.send(result)
+             res.json(result)
          })
-         
+
          app.post('/orders', async(req, res)=>{
             const order = req.body;
-            console.log(order)
             const result = await orderCollection.insertOne(order);
             res.json(result )
         })
@@ -43,10 +42,19 @@ async function run(){
             const result = orderCollection.find({});
             const orders = await result.toArray();
             res.send(orders)
-        })
- 
-         
-      }
+        }) 
+
+       app.get('/orders/:email', async (req, res) =>{
+           const email = req.params.email;
+           const query = {email} ;
+           console.log(query)
+           const cursor =  orderCollection.find(query)
+           const result = await cursor.toArray();
+           res.json(result)
+       } )
+     
+      } 
+      
       finally{
         //  await client.close();
       }
