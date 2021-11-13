@@ -7,6 +7,7 @@ const ObjectId = require('mongodb').ObjectID;
 app.use(cors())
 app.use(express.json())
 const { MongoClient } = require('mongodb');
+const { ObjectID } = require('bson');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xbjez.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -18,6 +19,7 @@ async function run(){
          const database = client.db('Times_World')
          const productCollection = database.collection('products')
          const orderCollection = database.collection('Orders')
+         const reviewCollection = database.collection('reviews')
 
          app.get('/products', async (req, res)=>{
              const result =  productCollection.find({});
@@ -51,7 +53,31 @@ async function run(){
            const cursor =  orderCollection.find(query)
            const result = await cursor.toArray();
            res.json(result)
-       } )
+       } ) 
+
+       app.get('/order/:id', async(req, res)=>{
+           const id = req.params.id;
+           const query = {_id: ObjectID(id)}
+           const result = await orderCollection.findOne(query)
+           res.json(result)
+       })
+       app.get('/reviews', async(req, res)=>{
+           const result =  reviewCollection.find({});
+           const reviews = await result.toArray();
+           res.json(reviews)
+       }) 
+       app.post('/reviews' , async(req, res)=>{
+           const cursor = req.body;
+           const result = await reviewCollection.insertOne(cursor)
+           res.json(result)
+       })
+
+       app.delete('/order/:id', async (req, res)=>{
+           const id = req.params.id;
+           const query = {_id: ObjectID(id)};
+           const result = await orderCollection.deleteOne(query)
+           res.json(result)
+       })
      
       } 
       
