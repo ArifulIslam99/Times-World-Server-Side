@@ -139,6 +139,14 @@ async function run(){
 
        })
 
+       app.put('/orders/:id', async(req, res)=>{
+           const id = req.params.id;
+           const filter = {_id : ObjectID(id)}
+           const updateDoc = {$set: {status : 'shipped'}}
+           const result = await orderCollection.updateOne(filter, updateDoc)
+           res.json(result)
+       })
+
      
       } 
       
