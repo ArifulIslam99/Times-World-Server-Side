@@ -20,6 +20,7 @@ async function run(){
          const productCollection = database.collection('products')
          const orderCollection = database.collection('Orders')
          const reviewCollection = database.collection('reviews')
+         const usersCollection = database.collection('users')
 
          app.get('/products', async (req, res)=>{
              const result =  productCollection.find({});
@@ -77,7 +78,54 @@ async function run(){
            const query = {_id: ObjectID(id)};
            const result = await orderCollection.deleteOne(query)
            res.json(result)
+       })  
+
+       app.post('/users', async(req, res)=>{
+           const cursor = req.body;
+           const user = await usersCollection.insertOne(cursor)
+           res.json(user)
+
        })
+
+       app.get('/users', async ( req, res) =>{
+           const cursor = usersCollection.find({});
+           const result = await cursor.toArray();
+           res.json(result)
+
+       }) 
+
+       app.get('/users/:email', async (req, res) =>{
+           let isAdmin = false;
+           const email = req.params.email;
+           const query = {email: email}
+           const result = await usersCollection.findOne(query)
+           if(result.role)
+           {
+               isAdmin = true;
+           }
+           
+           res.json({admin: isAdmin})
+       })
+       app.put('/users', async ( req, res) =>{
+           const user = req.body;
+           console.log(user)
+           const filter = {email: user.email}
+           const options = { upsert : true}
+           const updateDoc = {$set: user};
+           const result = await usersCollection.updateOne(filter, updateDoc, options);
+           res.json(result)
+
+       }) 
+
+       app.put('/users/admin', async ( req, res) =>{
+           const user = req.body;
+           const filter = {email: user.email}
+           const updateDoc = {$set:{ role:"admin"}}
+           const result = await usersCollection.updateOne(filter, updateDoc)
+           res.json(result)
+
+       })
+
      
       } 
       
