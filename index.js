@@ -29,10 +29,23 @@ async function run(){
              res.json(products)
          })
 
+         app.post('/products', async(req, res)=>{
+             const product = req.body;
+             const result = await productCollection.insertOne(product)
+             res.json(result)
+         })
+
          app.get('/products/:id', async (req, res)=>{
              const id = req.params.id;
              const query = {_id: ObjectId(id)}
              const result = await productCollection.findOne(query)
+             res.json(result)
+         })
+
+         app.delete('/products/:id' , async (req, res)=>{
+             const id = req.params.id;
+             const query = {_id : ObjectID(id)};
+             const result = await productCollection.deleteOne(query)
              res.json(result)
          })
 
